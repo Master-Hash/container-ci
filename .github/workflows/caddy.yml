@@ -46,6 +46,6 @@ jobs:
             --platform linux/amd64,linux/arm64/v8,linux/ppc64le,linux/riscv64,linux/s390x \
             --label "${DOCKER_METADATA_OUTPUT_LABELS//$'\n'/,}" \
             -t ${{ env.REGISTRY_IMAGE }}:2.11.0-beta.1-cloudflare-uot-legacy \
-            --output type=registry \
+            --output type=registry,compression=gzip \
             .
         working-directory: caddy
