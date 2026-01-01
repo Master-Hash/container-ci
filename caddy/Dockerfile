@@ -5,8 +5,8 @@ FROM --platform=${BUILDPLATFORM} caddy:2.11.0-beta.1-builder-alpine AS builder
 ARG TARGETOS
 ARG TARGETARCH
 
-RUN --mount=type=cache,target=/root/.cache/go-build && \
-	go env -w GOMODCACHE=/root/.cache/go-build \
+RUN --mount=type=cache,target=/root/.cache/go-build \
+	go env -w GOMODCACHE=/root/.cache/go-build && \
 	# go env -w GOPROXY=https://goproxy.io,direct && \
 	go env -w GOAMD64=v3 && go env -w GO111MODULE=on && \
 	go env -w GOEXPERIMENT=greenteagc && \
