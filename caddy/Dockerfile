@@ -6,7 +6,7 @@ ARG TARGETOS
 ARG TARGETARCH
 
 RUN \
-	go env -w GOPROXY=https://goproxy.io,direct && \
+	# go env -w GOPROXY=https://goproxy.io,direct && \
 	go env -w GOAMD64=v3 && go env -w GO111MODULE=on && \
 	go env -w GOEXPERIMENT=greenteagc && \
 	GOOS=${TARGETOS} GOARCH=${TARGETARCH} xcaddy build v2.11.0-beta.1 \
