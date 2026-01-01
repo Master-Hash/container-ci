@@ -43,16 +43,14 @@ jobs:
       - run: |
           docker buildx build \
             --platform ${{ matrix.platforms }} \
-            --label "${LABEL_TEMP//$'\n'/,}" \
+            --label "${DOCKER_METADATA_OUTPUT_LABELS//$'\n'/,}" \
             -t ${{ env.REGISTRY_IMAGE }}:2.11.0-beta.1-cloudflare-uot \
             --output type=registry,compression=zstd,compression-level=22,force-compression=true,oci-mediatypes=true,oci-artifact=true \
             .
           docker buildx build \
             --platform ${{ matrix.platforms }} \
-            --labels "${LABEL_TEMP//$'\n'/,}" \
+            --labels "${DOCKER_METADATA_OUTPUT_LABELS//$'\n'/,}" \
             -t ${{ env.REGISTRY_IMAGE }}:2.11.0-beta.1-cloudflare-uot-legacy \
             --output type=registry \
             .
         working-directory: caddy
-        env:
-          LABEL_TEMP: ${{ steps.meta.outputs.labels }}
