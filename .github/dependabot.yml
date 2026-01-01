@@ -1,0 +1,44 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: cron
+      cronjob: "0 20 * * 0"
+      timezone: Etc/UTC
+  - package-ecosystem: docker
+    directories:
+      - "/caddy"
+    groups:
+      minor:
+        update-types:
+          - minor
+          - patch
+      major:
+        update-types:
+          - major
+    allow:
+      - dependency-type: all
+    schedule:
+      interval: cron
+      cronjob: "0 20 * * 0"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker-compose
+    directories:
+      - "/caddy"
+    groups:
+      minor:
+        update-types:
+          - minor
+          - patch
+      major:
+        update-types:
+          - major
+    allow:
+      - dependency-type: all
+    schedule:
+      interval: cron
+      cronjob: "0 20 * * 0"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 10

@@ -1,0 +1,65 @@
+# The Caddyfile is an easy way to configure your Caddy web server.
+#
+# Unless the file starts with a global options block, the first
+# uncommented line is always the address of your site.
+#
+# To use your own domain name (with automatic HTTPS), first make
+# sure your domain's A/AAAA DNS records are properly pointed to
+# this machine's public IP, then replace ":80" below with your
+# domain name.
+{
+	admin off
+	# auto_https off # Toggle if debuging with localhost.direct
+	order forward_proxy before file_server
+	log {
+		format console
+	}
+	servers {
+		protocols h1 h2
+		# protocols h1 h2 h3
+	}
+}
+
+:443, {$CADDY_HOSTNAME} {
+	# tls /localhost.direct.crt /localhost.direct.key # Toggle if debuging with localhost.direct
+	tls {
+		issuer acme {
+			profile shortlived
+			disable_http_challenge
+			disable_tlsalpn_challenge
+			dns cloudflare {$DNSAPI}
+		}
+	}
+
+	# Set this path to your site's directory.
+	root * /usr/share/caddy
+
+	forward_proxy {
+		basic_auth {$CADDY_USERNAME:user} {$CADDY_PASSWORD:pass}
+		hide_ip
+		hide_via
+		probe_resistance
+	}
+
+	# Enable the static file server.
+	file_server {
+		precompressed br zstd gzip
+	}
+	encode {
+		zstd best
+		gzip 9
+	}
+	header {
+		Strict-Transport-Security max-age=31536000
+		X-Content-Type-Options nosniff
+		Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:"
+		Cross-Origin-Opener-Policy same-origin
+		Cross-Origin-Embedder-Policy require-corp
+	}
+	log {
+		format console
+	}
+}
+
+# Refer to the Caddy docs for more information:
+# https://caddyserver.com/docs/caddyfile

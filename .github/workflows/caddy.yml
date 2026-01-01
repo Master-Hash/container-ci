@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  # workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/setup-buildx-action@v3
+
+      - run: |
+          docker buildx build \
+            --platform linux/amd64,linux/arm64/v8,linux/ppc64le,linux/riscv64,linux/s390x \
+            -t ghcr.io/master-hash/naiveproxy:2.11.0-beta.1-cloudflare-uot \
+            --output type=oci,compression=zstd,compression-level=22,force-compression=true \
+            .
+          docker buildx build \
+            --platform linux/amd64,linux/arm64/v8,linux/ppc64le,linux/riscv64,linux/s390x \
+            -t ghcr.io/master-hash/naiveproxy:2.11.0-beta.1-cloudflare-uot-legacy \
+            --output type=oci \
+            .
+        working-directory: caddy
+
+      - run: |
+          docker push ghcr.io/master-hash/naiveproxy:2.11.0-beta.1-cloudflare-uot
+          docker push ghcr.io/master-hash/naiveproxy:2.11.0-beta.1-cloudflare-uot-legacy
+        working-directory: caddy
+        env:
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
