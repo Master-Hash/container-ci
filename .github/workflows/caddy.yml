@@ -6,33 +6,49 @@ on:
     branches:
       - main
 
+env:
+  REGISTRY_IMAGE: ghcr.io/master-hash/naiveproxy
+
 permissions:
   packages: write
 
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-    steps:
-      - uses: actions/checkout@v6
+    strategy:
+      matrix:
+        platforms:
+          - linux/amd64
+          - linux/arm64/v8
+          - linux/ppc64le
+          - linux/riscv64
+          - linux/s390x
 
+    steps:
       - uses: docker/setup-buildx-action@v3
 
-      - run: |
-          docker buildx build \
-            --platform linux/amd64,linux/arm64/v8,linux/ppc64le,linux/riscv64,linux/s390x \
-            -t ghcr.io/master-hash/naiveproxy:2.11.0-beta.1-cloudflare-uot \
-            --output type=oci,compression=zstd,compression-level=22,force-compression=true \
-            .
-          docker buildx build \
-            --platform linux/amd64,linux/arm64/v8,linux/ppc64le,linux/riscv64,linux/s390x \
-            -t ghcr.io/master-hash/naiveproxy:2.11.0-beta.1-cloudflare-uot-legacy \
-            --output type=oci \
-            .
-        working-directory: caddy
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ${{ env.REGISTRY_IMAGE }}
 
       - run: |
-          docker push ghcr.io/master-hash/naiveproxy:2.11.0-beta.1-cloudflare-uot
-          docker push ghcr.io/master-hash/naiveproxy:2.11.0-beta.1-cloudflare-uot-legacy
+          docker buildx build \
+            --platform ${{ matrix.platforms }} \
+            --label ${{ steps.meta.outputs.labels }} \
+            -t ${{ env.REGISTRY_IMAGE }}:2.11.0-beta.1-cloudflare-uot \
+            --output type=registry,compression=zstd,compression-level=22,force-compression=true,oci-mediatypes=true,oci-artifact=true \
+            .
+          docker buildx build \
+            --platform ${{ matrix.platforms }} \
+            --labels ${{ steps.meta.outputs.labels }} \
+            -t ${{ env.REGISTRY_IMAGE }}:2.11.0-beta.1-cloudflare-uot-legacy \
+            --output type=registry \
+            .
         working-directory: caddy
-        env:
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
