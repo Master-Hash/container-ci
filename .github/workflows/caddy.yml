@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "caddy/**"
+      - ".github/workflows/caddy.yml"
 
 env:
   REGISTRY_IMAGE: ghcr.io/master-hash/naiveproxy
@@ -49,7 +52,7 @@ jobs:
             .
           docker buildx build \
             --platform ${{ matrix.platforms }} \
-            --labels "${DOCKER_METADATA_OUTPUT_LABELS//$'\n'/,}" \
+            --label "${DOCKER_METADATA_OUTPUT_LABELS//$'\n'/,}" \
             -t ${{ env.REGISTRY_IMAGE }}:2.11.0-beta.1-cloudflare-uot-legacy \
             --output type=registry \
             .
