@@ -22,6 +22,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # When GitHub ships Docker CE 29 by default, we can remove this step
+      - uses: docker/setup-docker-action@v4
+        with:
+          version: latest
+          daemon-config: |
+            {
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
+
       - uses: docker/setup-buildx-action@v3
 
       - uses: docker/login-action@v3
@@ -35,6 +46,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY_IMAGE }}
 
+      - uses: actions/cache@v4
+        with:
+          path: go-build-cache
+          key: ${{ runner.os }}-go-build-cache }}
+
+      - name: Inject go-build-cache
+        uses: reproducible-containers/buildkit-cache-dance@4b2444fec0c0fb9dbf175a96c094720a692ef810 # v2.1.4
+        with:
+          cache-source: go-build-cache
+
       - run: |
           docker buildx build \
             --platform linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x \
@@ -42,7 +63,7 @@ jobs:
             -t ${{ env.REGISTRY_IMAGE }}:2.11.0-beta.1-cloudflare-uot-compat \
             --output type=registry,compression=gzip \
             --cache-from type=gha \
-            --cache-to type=gha \
+            --cache-to type=gha,mode=max \
             .
           docker buildx build \
             --platform linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x \
