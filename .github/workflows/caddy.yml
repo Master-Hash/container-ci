@@ -37,15 +37,15 @@ jobs:
 
       - run: |
           docker buildx build \
-            --platform linux/amd64,linux/arm64/v8,linux/ppc64le,linux/riscv64,linux/s390x \
+            --platform linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x \
+            --label "${DOCKER_METADATA_OUTPUT_LABELS//$'\n'/,}" \
+            -t ${{ env.REGISTRY_IMAGE }}:2.11.0-beta.1-cloudflare-uot-compat \
+            --output type=registry,compression=gzip \
+            .
+          docker buildx build \
+            --platform linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x \
             --label "${DOCKER_METADATA_OUTPUT_LABELS//$'\n'/,}" \
             -t ${{ env.REGISTRY_IMAGE }}:2.11.0-beta.1-cloudflare-uot \
             --output type=registry,compression=zstd,compression-level=22,force-compression=true,oci-mediatypes=true,oci-artifact=true \
-            .
-          docker buildx build \
-            --platform linux/amd64,linux/arm64/v8,linux/ppc64le,linux/riscv64,linux/s390x \
-            --label "${DOCKER_METADATA_OUTPUT_LABELS//$'\n'/,}" \
-            -t ${{ env.REGISTRY_IMAGE }}:2.11.0-beta.1-cloudflare-uot-legacy \
-            --output type=registry,compression=gzip \
             .
         working-directory: caddy
