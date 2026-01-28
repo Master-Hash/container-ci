@@ -1,7 +1,7 @@
 # sudo nerdctl build . -t ghcr.io/master-hash/naiveproxy:2.10.2-cloudflare --platform linux/amd64,linux/arm64/v8,linux/ppc64le,linux/riscv64,linux/s390x --output type=oci,compression=zstd,compression-level=22,force-compression=true
 # sudo nerdctl push ghcr.io/master-hash/naiveproxy:2.10.2-cloudflare
 
-FROM --platform=${BUILDPLATFORM} caddy:2.11.0-beta.1-builder-alpine AS builder
+FROM --platform=${BUILDPLATFORM} caddy:2.11.0-beta.2-builder-alpine AS builder
 ARG TARGETOS
 ARG TARGETARCH
 
@@ -23,7 +23,7 @@ COPY ./Caddyfile /etc/caddy/Caddyfile
 # RUN \
 # 	caddy fmt /etc/caddy/Caddyfile --overwrite
 
-FROM --platform=${TARGETPLATFORM} caddy:2.11.0-beta.1-alpine
+FROM --platform=${TARGETPLATFORM} caddy:2.11.0-beta.2-alpine
 
 COPY --link --from=builder /usr/bin/caddy /usr/bin/caddy
 # COPY ./localhost.direct.key /localhost.direct.key
