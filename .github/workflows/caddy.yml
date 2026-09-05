@@ -47,7 +47,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY_IMAGE }}
 
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: cache
         with:
           path: go-build-cache
