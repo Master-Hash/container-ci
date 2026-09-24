@@ -11,6 +11,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 	go env -w GOAMD64=v3 && go env -w GO111MODULE=on && \
 	GOOS=${TARGETOS} GOARCH=${TARGETARCH} xcaddy build v2.11.4 \
 	--with github.com/caddy-dns/cloudflare \
+	--with github.com/mholt/caddy-l4 \
 	# --with github.com/caddyserver/forwardproxy=github.com/klzgrad/forwardproxy@naive
 	--with github.com/caddyserver/forwardproxy=github.com/zedifen/forwardproxy@naive
 # --with github.com/caddyserver/forwardproxy=github.com/imgk/forwardproxy@udpinhttp
